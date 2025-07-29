@@ -2,4 +2,4 @@ import { Router } from "express";
 
 const routes = Router();
 
-export const authRoutes = routes;
+export const userRoutes = routes;
