@@ -2,8 +2,9 @@ import { StatusCodes } from "http-status-codes";
 import envVariables from "../config/env";
 import AppError from "../errorHelpers/AppError";
 import { IsActive, IUser } from "../modules/user/user.interface";
-import { User } from "../modules/user/user.model";
+
 import { generateJwtToken, verifyJwtToken } from "./jwt";
+import User from "../modules/user/user.model";
 
 export const generateAuthTokens = (user: Partial<IUser>) => {
   const jwtPayload = {
