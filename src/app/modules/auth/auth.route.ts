@@ -7,4 +7,7 @@ const router = Router();
 
 router.post("/login", validateRequest(userLoginJodValidation), authController.credentialLogin);
 router.post("/refresh-token", authController.generateAccessTokenFromRefreshToken);
+
+router.post("/logout", authController.logout);
+
 export const authRoutes = router;
