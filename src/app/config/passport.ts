@@ -70,8 +70,7 @@ passport.serializeUser((user: any, done: (err: any, id?: unknown) => void) => {
 
 passport.deserializeUser(async (id: string, done: any) => {
   try {
-    // const user = await User.findById(id);
-    const user = {};
+    const user = await User.findById(id).select("-password");
     done(null, user);
   } catch (error) {
     done(error);
