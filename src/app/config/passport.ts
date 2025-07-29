@@ -1,3 +1,4 @@
+import bcryptjs from "bcryptjs";
 // import bcryptjs from "bcryptjs";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import passport from "passport";
@@ -5,6 +6,8 @@ import passport from "passport";
 // import User from "../modules/user/user.model";
 // import { IsActive, UserRole } from "../modules/user/user.interface";
 import { Strategy as LocalStrategy } from "passport-local";
+import User from "../modules/user/user.model";
+import { IsActive } from "../modules/user/user.interface";
 
 // email password authentication with passport
 
@@ -22,29 +25,28 @@ passport.use(
         }
 
         // check if user exists
-        // const user = await User.findOne({ email });
-        const user = {}; // Mock user object for demonstration
+        const user = await User.findOne({ email });
 
         if (!user) {
           return done(null, false, { message: "User not found" });
         }
-        // if (!user.isVerified) {
-        //   return done(null, false, { message: "User is not verified" });
-        // }
-        // if (user.isActive === IsActive.BLOCKED || user.isActive === IsActive.INACTIVE) {
-        //   return done(null, false, { message: `User is ${user.isActive}` });
-        // }
-        // if (user.isDeleted) {
-        //   return done(null, false, { message: "User is deleted" });
-        // }
+        if (!user.isVerified) {
+          return done(null, false, { message: "User is not verified" });
+        }
+        if (user.isActive === IsActive.BLOCKED || user.isActive === IsActive.INACTIVE) {
+          return done(null, false, { message: `User is ${user.isActive}` });
+        }
+        if (user.isDeleted) {
+          return done(null, false, { message: "User is deleted" });
+        }
 
         // check if the users is google authenticated
 
-        // const isPasswordMatch = await bcryptjs.compare(password, user.password as string);
+        const isPasswordMatch = await bcryptjs.compare(password, user.password as string);
 
-        // if (!isPasswordMatch) {
-        //   return done(null, false, { message: "Password is incorrect" });
-        // }
+        if (!isPasswordMatch) {
+          return done(null, false, { message: "Password is incorrect" });
+        }
 
         return done(null, user);
       } catch (error) {
