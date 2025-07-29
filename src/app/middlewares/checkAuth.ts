@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
-import { verifyToken } from "../utils/jwt";
+
 import envVariables from "../config/env";
 import AppError from "../errorHelpers/AppError";
 import { IsActive, UserRole } from "../modules/user/user.interface";
 import User from "../modules/user/user.model";
+import { verifyJwtToken } from "../utils/jwt";
 
 export const checkAuth =
   (...authRoles: UserRole[]) =>
@@ -14,7 +15,7 @@ export const checkAuth =
       if (!accessToken) {
         throw new AppError(StatusCodes.UNAUTHORIZED, "Access token is required");
       }
-      const verifiedToken = verifyToken(accessToken, envVariables.ACCESS_TOKEN_JWT_SECRET);
+      const verifiedToken = verifyJwtToken(accessToken, envVariables.ACCESS_TOKEN_JWT_SECRET);
 
       const isUserExist = await User.findOne({ email: verifiedToken.email });
 
