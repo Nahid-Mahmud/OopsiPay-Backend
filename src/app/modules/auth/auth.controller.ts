@@ -6,6 +6,7 @@ import { authService } from "./auth.service";
 import { setAuthCookie } from "../../utils/setAuthCookie";
 import { generateAuthTokens } from "../../utils/userTokens";
 import { IUser } from "../user/user.interface";
+import envVariables from "../../config/env";
 
 const credentialLogin = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const result = (await authService.credentialLogin(req, res, next)) as Partial<IUser>;
@@ -49,7 +50,30 @@ const generateAccessTokenFromRefreshToken = catchAsync(async (req: Request, res:
   });
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const logout = catchAsync(async (req: Request, res: Response, _next: NextFunction) => {
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    secure: envVariables.NODE_ENV === "production",
+    sameSite: "lax",
+  });
+
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: envVariables.NODE_ENV === "production",
+    sameSite: "lax",
+  });
+
+  sendResponse(res, {
+    success: true,
+    message: "User logged out successfully",
+    statusCode: 200,
+    data: null,
+  });
+});
+
 export const authController = {
   credentialLogin,
   generateAccessTokenFromRefreshToken,
+  logout,
 };
