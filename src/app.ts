@@ -13,7 +13,7 @@ import envVariables from "./app/config/env";
 export const app = express();
 app.use(
   expressSession({
-    secret: process.env.SESSION_SECRET || "defaultSecret",
+    secret: envVariables.EXPRESS_SESSION_SECRET || "defaultSecret",
     resave: false,
     saveUninitialized: false,
   })
