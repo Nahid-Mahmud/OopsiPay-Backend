@@ -18,11 +18,14 @@ export interface IUser {
   firstName: string;
   lastName: string;
   email: string;
+  profilePicture?: string;
   password: string;
   role: UserRole;
   isActive: IsActive;
   isDeleted: boolean;
   isVerified?: boolean;
   createdAt?: Date;
-  profilePicture?: string;
-}
+  pin?: string;
+  phone: string;
+  address?: string;
+} 
