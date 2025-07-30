@@ -5,7 +5,13 @@ import { generateOtp } from "./generateOtp";
 import { redisClient } from "../config/redis.config";
 import { sendEmail } from "./sendEmail";
 
-export const sendOtpEmail = async ({ email, expirationTimeInSeconds }: { email: string; expirationTimeInSeconds: number }) => {
+export const sendOtpEmail = async ({
+  email,
+  expirationTimeInSeconds = 120,
+}: {
+  email: string;
+  expirationTimeInSeconds?: number;
+}) => {
   const user = await User.findOne({ email });
   if (!user) {
     throw new AppError(StatusCodes.NOT_FOUND, "User not found");
@@ -20,7 +26,7 @@ export const sendOtpEmail = async ({ email, expirationTimeInSeconds }: { email: 
   await redisClient.set(redisKey, otp, {
     expiration: {
       type: "EX",
-      value: expirationTimeInSeconds,
+      value: expirationTimeInSeconds || 120,
     },
   });
 
@@ -31,6 +37,7 @@ export const sendOtpEmail = async ({ email, expirationTimeInSeconds }: { email: 
     templateData: {
       name: user.firstName + " " + user.lastName,
       otp: otp,
+      expiresIn: expirationTimeInSeconds / 60,
     },
   });
 };
