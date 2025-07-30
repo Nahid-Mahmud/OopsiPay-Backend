@@ -18,4 +18,6 @@ router.patch(
   authController.resetPassword
 );
 
+router.patch("/change-password", checkAuth(...Object.values(UserRole)), authController.changePassword);
+
 export const authRoutes = router;

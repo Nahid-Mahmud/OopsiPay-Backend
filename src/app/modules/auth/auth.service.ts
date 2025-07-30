@@ -8,6 +8,7 @@ import { createNewRefreshToken } from "../../utils/userTokens";
 import User from "../user/user.model";
 import { JwtPayload } from "jsonwebtoken";
 import envVariables from "../../config/env";
+import { passwordZodValidationSchema } from "../user/user.validation";
 
 const credentialLogin = async (req: Request, res: Response, next: NextFunction) => {
   return new Promise((resolve, reject) => {
@@ -48,8 +49,46 @@ const resetPassword = async (newPassword: string, id: string, decodedToken: JwtP
   await isUserExist.save();
 };
 
+const changePassword = async (oldPassword: string, newPassword: string, decodedToken: JwtPayload) => {
+  if (!decodedToken) {
+    throw new AppError(StatusCodes.UNAUTHORIZED, "You are not authorized to perform this action");
+  }
+
+  // validate old password and new password
+  if (oldPassword === newPassword) {
+    throw new AppError(StatusCodes.BAD_REQUEST, "New password must be different from old password");
+  }
+
+  // validate new password
+  const zodPasswordValidationResult = await passwordZodValidationSchema.parseAsync(newPassword);
+
+  // get user from database
+  const userFromDb = await User.findById(decodedToken.userId);
+
+  // check if user exists
+  if (!userFromDb) {
+    throw new AppError(StatusCodes.NOT_FOUND, "User not found");
+  }
+
+  // check if old password is correct
+  const isPasswordMatch = await bcryptjs.compare(oldPassword, userFromDb.password as string);
+
+  // if old password is incorrect, throw error
+  if (!isPasswordMatch) {
+    throw new AppError(StatusCodes.UNAUTHORIZED, "Old password is incorrect");
+  }
+
+  // old password and new password should not be the same
+
+  const hashedNewPassword = await bcryptjs.hash(zodPasswordValidationResult, Number(envVariables.BCRYPT_SALT_ROUNDS));
+
+  // update user password
+  await User.findByIdAndUpdate(userFromDb._id, { password: hashedNewPassword }, { new: true, runValidators: true });
+};
+
 export const authService = {
   credentialLogin,
   generateAccessTokenFromRefreshToken,
   resetPassword,
+  changePassword,
 };
