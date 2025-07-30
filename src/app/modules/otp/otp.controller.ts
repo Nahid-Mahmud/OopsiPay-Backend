@@ -6,7 +6,7 @@ import sendResponse from "../../utils/sendResponse";
 import { StatusCodes } from "http-status-codes";
 import { sendOtpEmail } from "../../utils/sendOtpEmail";
 
-const sendOtp = catchAsync(async (req: Request, res: Response, _next: NextFunction) => {
+const resendOtp = catchAsync(async (req: Request, res: Response, _next: NextFunction) => {
   const { email } = req.body;
 
   await sendOtpEmail({
@@ -34,6 +34,6 @@ const verifyOtpUser = catchAsync(async (req: Request, res: Response, _next: Next
 });
 
 export const otpController = {
-  sendOtp,
+  resendOtp,
   verifyOtpUser,
 };

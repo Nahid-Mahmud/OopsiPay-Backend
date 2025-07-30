@@ -45,14 +45,14 @@ app.use("/api/v1", router);
 
 app.get("/", (req: Request, res: Response) => {
   res.json({
-    message: "Welcome to Digital Wallet Management API",
+    message: "Welcome to OopsiPay - Digital Wallet Management API",
     status: "success",
   });
 });
 
 app.get("/api/v1", (req: Request, res: Response) => {
   res.json({
-    message: "You are in the API",
+    message: "You are in the OopsiPay API",
     status: "success",
   });
 });
