@@ -9,6 +9,7 @@ import { generateAuthTokens } from "../../utils/userTokens";
 import { IUser } from "../user/user.interface";
 import envVariables from "../../config/env";
 import { JwtPayload } from "jsonwebtoken";
+import AppError from "../../errorHelpers/AppError";
 
 const credentialLogin = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const result = (await authService.credentialLogin(req, res, next)) as Partial<IUser>;
@@ -87,8 +88,6 @@ const resetPassword = catchAsync(async (req: Request, res: Response, _next: Next
   });
 });
 
-
-
 const changePassword = catchAsync(async (req: Request, res: Response, _next: NextFunction) => {
   const decodedToken = req.user;
 
@@ -104,10 +103,29 @@ const changePassword = catchAsync(async (req: Request, res: Response, _next: Nex
   });
 });
 
+const forgotPassword = catchAsync(async (req: Request, res: Response, _next: NextFunction) => {
+  const { email } = req.body;
+
+  if (!email) {
+    throw new AppError(StatusCodes.BAD_REQUEST, "Email is required");
+  }
+
+  // Call the service to handle forgot password logic
+  await authService.forgotPassword(email);
+
+  sendResponse(res, {
+    success: true,
+    message: "Password reset email sent successfully",
+    statusCode: StatusCodes.OK,
+    data: null,
+  });
+});
+
 export const authController = {
   credentialLogin,
   generateAccessTokenFromRefreshToken,
   logout,
   resetPassword,
   changePassword,
+  forgotPassword,
 };

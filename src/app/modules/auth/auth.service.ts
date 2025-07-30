@@ -9,6 +9,9 @@ import User from "../user/user.model";
 import { JwtPayload } from "jsonwebtoken";
 import envVariables from "../../config/env";
 import { passwordZodValidationSchema } from "../user/user.validation";
+import jwt from "jsonwebtoken";
+import { IsActive } from "../user/user.interface";
+import { sendEmail } from "../../utils/sendEmail";
 
 const credentialLogin = async (req: Request, res: Response, next: NextFunction) => {
   return new Promise((resolve, reject) => {
@@ -86,9 +89,51 @@ const changePassword = async (oldPassword: string, newPassword: string, decodedT
   await User.findByIdAndUpdate(userFromDb._id, { password: hashedNewPassword }, { new: true, runValidators: true });
 };
 
+const forgotPassword = async (email: string) => {
+  //
+
+  const isUserExist = await User.findOne({ email });
+
+  if (!isUserExist) {
+    throw new AppError(StatusCodes.BAD_REQUEST, "User does not exist");
+  }
+  if (isUserExist.isActive === IsActive.BLOCKED || isUserExist.isActive === IsActive.INACTIVE) {
+    throw new AppError(StatusCodes.BAD_REQUEST, `User is ${isUserExist.isActive}`);
+  }
+  if (isUserExist.isDeleted) {
+    throw new AppError(StatusCodes.BAD_REQUEST, "User is deleted");
+  }
+
+  if (!isUserExist.isVerified) {
+    throw new AppError(StatusCodes.BAD_REQUEST, "User is not verified");
+  }
+
+  const JwtPayload = {
+    userId: isUserExist._id,
+    email: isUserExist.email,
+    role: isUserExist.role,
+  };
+
+  const resetToken = jwt.sign(JwtPayload, envVariables.ACCESS_TOKEN_JWT_SECRET, {
+    expiresIn: "10m",
+  });
+
+  const resetUILink = `${envVariables.FRONTEND_URL}/reset-password?id=${isUserExist._id}&token=${resetToken}`;
+  sendEmail({
+    to: isUserExist.email,
+    subject: "Password Reset Request",
+    templateName: "forgotPassword.ejs",
+    templateData: {
+      name: isUserExist.firstName + " " + isUserExist.lastName,
+      resetUILink: resetUILink,
+    },
+  });
+};
+
 export const authService = {
   credentialLogin,
   generateAccessTokenFromRefreshToken,
   resetPassword,
   changePassword,
+  forgotPassword,
 };
