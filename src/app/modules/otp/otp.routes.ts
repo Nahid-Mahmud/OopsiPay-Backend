@@ -5,6 +5,6 @@ const router = Router();
 
 router.post("/send", otpController.sendOtp);
 
-router.post("/verify", otpController.verifyOtp);
+router.post("/verify-user", otpController.verifyOtpUser);
 
 export const otpRoutes = router;

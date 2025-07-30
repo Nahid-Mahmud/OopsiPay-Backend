@@ -1,9 +1,10 @@
 import { StatusCodes } from "http-status-codes";
 import { redisClient } from "../../config/redis.config";
 import AppError from "../../errorHelpers/AppError";
-import { generateOtp } from "../../utils/genarageOtp";
+import { generateOtp } from "../../utils/generateOtp";
 import { sendEmail } from "../../utils/sendEmail";
 import User from "../user/user.model";
+import verifyOtp from "../../utils/verifyOtp";
 
 const OTP_EXPIRATION_TIME = 2 * 60; // 2 minutes in seconds
 
@@ -16,7 +17,7 @@ const sendOtp = async (email: string) => {
     throw new AppError(StatusCodes.BAD_REQUEST, "User is already verified");
   }
 
-  const otp = generateOtp();
+  const otp = generateOtp(6);
   // store otp in redis
   const redisKey = `otp:${email}`;
   await redisClient.set(redisKey, otp, {
@@ -37,28 +38,29 @@ const sendOtp = async (email: string) => {
   });
 };
 
-const verifyOtp = async (email: string, otp: string) => {
-  const user = await User.findOne({ email });
-  if (!user) {
-    throw new AppError(StatusCodes.NOT_FOUND, "User not found");
+const verifyOtpUser = async (email: string, otp: string) => {
+  const session = await User.startSession();
+  session.startTransaction();
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw new AppError(StatusCodes.NOT_FOUND, "User not found");
+    }
+    if (user.isVerified) {
+      throw new AppError(StatusCodes.BAD_REQUEST, "User is already verified");
+    }
+    await verifyOtp(email, otp);
+    await User.updateOne({ email }, { isVerified: true }, { runValidators: true, session });
+    await session.commitTransaction();
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    session.endSession();
   }
-  if (user.isVerified) {
-    throw new AppError(StatusCodes.BAD_REQUEST, "User is already verified");
-  }
-
-  const redisKey = `otp:${email}`;
-  const savedOtp = await redisClient.get(redisKey);
-  if (!savedOtp) {
-    throw new AppError(StatusCodes.UNAUTHORIZED, "OTP has expired or does not exist");
-  }
-  if (savedOtp !== otp) {
-    throw new AppError(StatusCodes.UNAUTHORIZED, "Invalid OTP");
-  }
-
-  await Promise.all([User.updateOne({ email }, { isVerified: true }), redisClient.del(redisKey)]);
 };
 
 export const otpServices = {
   sendOtp,
-  verifyOtp,
+  verifyOtpUser,
 };
