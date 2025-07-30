@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import AppError from "../../errorHelpers/AppError";
-import { otpServices } from "../otp/otp.service";
+import { sendOtpEmail } from "../../utils/sendOtpEmail";
 import { hashPassword } from "./../../utils/hashPassword";
 import { IUser } from "./user.interface";
 import User from "./user.model";
@@ -41,7 +41,10 @@ const createUser = async (payload: Partial<IUser>) => {
     await session.commitTransaction();
 
     // send OTP after the transaction is committed
-    await otpServices.sendOtp(email);
+    await sendOtpEmail({
+      email,
+      expirationTimeInSeconds: 300, // 5 minutes
+    });
 
     return rest;
   } catch (error) {
