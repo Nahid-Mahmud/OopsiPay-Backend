@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
@@ -7,6 +8,7 @@ import { setAuthCookie } from "../../utils/setAuthCookie";
 import { generateAuthTokens } from "../../utils/userTokens";
 import { IUser } from "../user/user.interface";
 import envVariables from "../../config/env";
+import { JwtPayload } from "jsonwebtoken";
 
 const credentialLogin = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const result = (await authService.credentialLogin(req, res, next)) as Partial<IUser>;
@@ -30,7 +32,6 @@ const credentialLogin = catchAsync(async (req: Request, res: Response, next: Nex
   });
 });
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const generateAccessTokenFromRefreshToken = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const refreshToken = req.cookies.refreshToken;
 
@@ -50,7 +51,6 @@ const generateAccessTokenFromRefreshToken = catchAsync(async (req: Request, res:
   });
 });
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const logout = catchAsync(async (req: Request, res: Response, _next: NextFunction) => {
   res.clearCookie("accessToken", {
     httpOnly: true,
@@ -72,8 +72,24 @@ const logout = catchAsync(async (req: Request, res: Response, _next: NextFunctio
   });
 });
 
+const resetPassword = catchAsync(async (req: Request, res: Response, _next: NextFunction) => {
+  const decodedToken = req.user;
+
+  const { newPassword, id } = req.body;
+
+  await authService.resetPassword(newPassword, id, decodedToken as JwtPayload);
+
+  sendResponse(res, {
+    success: true,
+    message: "Password reset successfully",
+    statusCode: StatusCodes.OK,
+    data: null,
+  });
+});
+
 export const authController = {
   credentialLogin,
   generateAccessTokenFromRefreshToken,
   logout,
+  resetPassword,
 };
