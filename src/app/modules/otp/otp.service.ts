@@ -2,6 +2,9 @@ import { StatusCodes } from "http-status-codes";
 import AppError from "../../errorHelpers/AppError";
 import verifyOtp from "../../utils/verifyOtp";
 import User from "../user/user.model";
+import { Wallet } from "../wallet/wallet.model";
+import createWalletNumber from "../../utils/createWalletNumber";
+import { WalletStatus, WalletType } from "../wallet/wallet.interface";
 
 const verifyOtpUser = async (email: string, otp: string) => {
   const session = await User.startSession();
@@ -16,6 +19,20 @@ const verifyOtpUser = async (email: string, otp: string) => {
     }
     await verifyOtp(email, otp);
     await User.updateOne({ email }, { isVerified: true }, { runValidators: true, session });
+
+    await Wallet.create(
+      [
+        {
+          user: user._id,
+          walletNumber: createWalletNumber(),
+          balance: 50000,
+          walletType: WalletType.USER,
+          walletStatus: WalletStatus.ACTIVE,
+        },
+      ],
+      { session }
+    );
+
     await session.commitTransaction();
   } catch (error) {
     await session.abortTransaction();

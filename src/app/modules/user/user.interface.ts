@@ -13,6 +13,13 @@ export enum IsActive {
   BLOCKED = "BLOCKED",
 }
 
+export enum AgentRequestStatus {
+  NONE = "NONE",
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
+}
+
 export interface IUser {
   _id: Types.ObjectId;
   firstName: string;
@@ -28,4 +35,5 @@ export interface IUser {
   isActive: IsActive;
   isDeleted: boolean;
   isVerified?: boolean;
+  agentRequestStatus?: AgentRequestStatus;
 }

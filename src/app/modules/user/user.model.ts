@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import { IsActive, IUser, UserRole } from "./user.interface";
+import { AgentRequestStatus, IsActive, IUser, UserRole } from "./user.interface";
 
 const userSchema = new Schema<IUser>(
   {
@@ -15,6 +15,7 @@ const userSchema = new Schema<IUser>(
     address: { type: String },
     phone: { type: String },
     pin: { type: String },
+    agentRequestStatus: { type: String, enum: Object.values(AgentRequestStatus), default: AgentRequestStatus.NONE },
   },
   {
     timestamps: true,

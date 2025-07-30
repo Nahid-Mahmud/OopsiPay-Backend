@@ -1,10 +1,10 @@
 import { StatusCodes } from "http-status-codes";
+import { JwtPayload } from "jsonwebtoken";
 import AppError from "../../errorHelpers/AppError";
 import { sendOtpEmail } from "../../utils/sendOtpEmail";
 import { hashPassword } from "./../../utils/hashPassword";
 import { IUser, UserRole } from "./user.interface";
 import User from "./user.model";
-import { JwtPayload } from "jsonwebtoken";
 
 // create user
 const createUser = async (payload: Partial<IUser>) => {
@@ -38,6 +38,8 @@ const createUser = async (payload: Partial<IUser>) => {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password: userPassword, ...rest } = res[0].toObject();
+
+    // create wallet number
 
     // commit the transaction first
     await session.commitTransaction();
@@ -110,9 +112,7 @@ const getAllUsers = async () => {
 
 // get logged-in user
 const getMe = async (userId: string) => {
-  const user = await User.findById(userId).select(
-    "-password -isActive -isVerified"
-  );
+  const user = await User.findById(userId).select("-password -isActive -isVerified");
   if (!user) {
     throw new AppError(StatusCodes.NOT_FOUND, "User not found");
   }
