@@ -11,6 +11,7 @@ const userSchema = new Schema<IUser>(
     isActive: { type: String, enum: Object.values(IsActive), default: IsActive.ACTIVE },
     isDeleted: { type: Boolean, default: false },
     isVerified: { type: Boolean, default: false },
+    profilePicture: { type: String },
   },
   {
     timestamps: true,

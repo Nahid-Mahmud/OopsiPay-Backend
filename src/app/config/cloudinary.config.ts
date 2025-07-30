@@ -43,6 +43,7 @@ export const deleteImageFormCloudinary = async (url: string) => {
   }
 };
 
+// for invoice upload or any other pdf upload
 export const uploadBufferToCloudinary = async (
   buffer: Buffer,
   fileName: string

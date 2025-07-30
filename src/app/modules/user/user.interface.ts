@@ -24,4 +24,5 @@ export interface IUser {
   isDeleted: boolean;
   isVerified?: boolean;
   createdAt?: Date;
+  profilePicture?: string;
 }

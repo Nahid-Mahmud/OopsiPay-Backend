@@ -30,4 +30,5 @@ export const updateUserZodSchema = z.object({
   lastName: z.string().optional(),
   email: z.email("Invalid email format").optional(),
   role: z.enum(Object.values(UserRole)).optional(),
+  profilePicture: z.string().optional(),
 });

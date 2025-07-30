@@ -110,7 +110,9 @@ const getAllUsers = async () => {
 
 // get logged-in user
 const getMe = async (userId: string) => {
-  const user = await User.findById(userId).select("-password");
+  const user = await User.findById(userId).select(
+    "-password -isActive -isVerified"
+  );
   if (!user) {
     throw new AppError(StatusCodes.NOT_FOUND, "User not found");
   }
