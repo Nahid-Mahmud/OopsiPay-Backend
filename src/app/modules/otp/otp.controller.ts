@@ -4,11 +4,16 @@ import { catchAsync } from "../../utils/catchAsync";
 import { otpServices } from "./otp.service";
 import sendResponse from "../../utils/sendResponse";
 import { StatusCodes } from "http-status-codes";
+import { sendOtpEmail } from "../../utils/sendOtpEmail";
 
 const sendOtp = catchAsync(async (req: Request, res: Response, _next: NextFunction) => {
   const { email } = req.body;
 
-  await otpServices.sendOtp(email);
+  await sendOtpEmail({
+    email,
+    expirationTimeInSeconds: 120, // 2 minutes
+  });
+
   sendResponse(res, {
     success: true,
     message: "OTP sent successfully",
