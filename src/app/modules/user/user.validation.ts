@@ -24,3 +24,10 @@ export const userCreateZodSchema = z.object({
   password: passwordZodValidationSchema,
   role: z.enum(Object.values(UserRole)).optional(),
 });
+
+export const updateUserZodSchema = z.object({
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  email: z.email("Invalid email format").optional(),
+  role: z.enum(Object.values(UserRole)).optional(),
+});
