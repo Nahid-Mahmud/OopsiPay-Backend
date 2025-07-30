@@ -20,12 +20,12 @@ export interface IUser {
   email: string;
   profilePicture?: string;
   password: string;
-  role: UserRole;
-  isActive: IsActive;
-  isDeleted: boolean;
-  isVerified?: boolean;
   createdAt?: Date;
   pin?: string;
   phone: string;
   address?: string;
-} 
+  role: UserRole;
+  isActive: IsActive;
+  isDeleted: boolean;
+  isVerified?: boolean;
+}

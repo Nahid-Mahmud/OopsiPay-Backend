@@ -12,6 +12,9 @@ const userSchema = new Schema<IUser>(
     isDeleted: { type: Boolean, default: false },
     isVerified: { type: Boolean, default: false },
     profilePicture: { type: String },
+    address: { type: String },
+    phone: { type: String },
+    pin: { type: String },
   },
   {
     timestamps: true,
