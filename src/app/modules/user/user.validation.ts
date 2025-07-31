@@ -1,5 +1,5 @@
 import z from "zod";
-import { UserRole } from "./user.interface";
+import { IsActive, UserRole } from "./user.interface";
 
 export const passwordZodValidationSchema = z
   .string()
@@ -32,9 +32,15 @@ export const updateUserZodSchema = z.object({
   profilePicture: z.string().optional(),
   address: z.string().optional(),
   phone: z.string().optional(),
+  // pin: z.string().min(5, "Pin must be at least 5 characters long").optional(),
+  // pin must be exactly 5 characters long
+  pin: z.string().length(5, "Pin must be exactly 5 characters long").optional(),
+  isActive: z.enum(IsActive).optional(),
+  isDeleted: z.boolean().optional(),
+  isVerified: z.boolean().optional(),
 });
 
 export const changePinZodSchema = z.object({
-  oldPin: z.string().min(5, "Old pin must be at least 4 characters long"),
-  newPin: z.string().min(5, "New pin must be at least 4 characters long"),
+  oldPin: z.string().min(5, "Old pin must be at least 5 characters long"),
+  newPin: z.string().min(5, "New pin must be at least 5 characters long"),
 });

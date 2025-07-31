@@ -1,12 +1,12 @@
+import bcrypt from "bcryptjs";
 import { StatusCodes } from "http-status-codes";
 import { JwtPayload } from "jsonwebtoken";
+import envVariables from "../../config/env";
 import AppError from "../../errorHelpers/AppError";
 import { sendOtpEmail } from "../../utils/sendOtpEmail";
 import { hashPassword } from "./../../utils/hashPassword";
 import { IUser, UserRole } from "./user.interface";
 import User from "./user.model";
-import bcrypt from "bcryptjs";
-import envVariables from "../../config/env";
 
 // create user
 const createUser = async (payload: Partial<IUser>) => {
@@ -98,10 +98,21 @@ const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken:
     }
   }
 
+  if (payload.pin && (user.role === UserRole.USER || user.role === UserRole.AGENT)) {
+    // check if pin has already been set
+    if (user.pin) {
+      throw new AppError(StatusCodes.BAD_REQUEST, "Pin has already been set. Use change pin to update it");
+    }
+  }
+
+  if (payload.pin) {
+    payload.pin = await bcrypt.hash(payload.pin, Number(envVariables.BCRYPT_SALT_ROUNDS));
+  }
+
   const updatedUser = await User.findByIdAndUpdate(userId, payload, {
     new: true,
     runValidators: true,
-  }).select("-password");
+  }).select("-password -pin");
   return updatedUser;
 };
 
