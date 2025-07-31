@@ -32,5 +32,9 @@ export const updateUserZodSchema = z.object({
   profilePicture: z.string().optional(),
   address: z.string().optional(),
   phone: z.string().optional(),
-  pin: z.string().optional(),
+});
+
+export const changePinZodSchema = z.object({
+  oldPin: z.string().min(5, "Old pin must be at least 4 characters long"),
+  newPin: z.string().min(5, "New pin must be at least 4 characters long"),
 });

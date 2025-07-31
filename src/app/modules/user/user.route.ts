@@ -30,4 +30,8 @@ router.get("/me", checkAuth(...Object.values(UserRole)), userController.getMe);
 
 router.get("/:userId", checkAuth(UserRole.ADMIN, UserRole.SUPER_ADMIN), userController.getUserById);
 
+
+router.post("/change-pin", checkAuth(...Object.values(UserRole)), userController.changePin);
+
+
 export const userRoutes = router;

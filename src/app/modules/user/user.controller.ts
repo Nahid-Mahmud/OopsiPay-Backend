@@ -78,10 +78,25 @@ const getUserById = catchAsync(async (req: Request, res: Response, _next: NextFu
   });
 });
 
+const changePin = catchAsync(async (req: Request, res: Response, _next: NextFunction) => {
+  const decodedToken = req.user as JwtPayload;
+  const { oldPin, newPin } = req.body;
+
+  const user = await userService.changePin(decodedToken.userId, oldPin, newPin);
+
+  sendResponse(res, {
+    success: true,
+    message: "Pin changed successfully",
+    data: user,
+    statusCode: StatusCodes.OK,
+  });
+});
+
 export const userController = {
   createUser,
   updateUser,
   getAllUsers,
   getMe,
   getUserById,
+  changePin,
 };

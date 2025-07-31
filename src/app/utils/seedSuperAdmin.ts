@@ -6,6 +6,7 @@ import { WalletStatus, WalletType } from "../modules/wallet/wallet.interface";
 import { Wallet } from "../modules/wallet/wallet.model";
 import createWalletNumber from "./createWalletNumber";
 import { hashPassword } from "./hashPassword";
+import bcrypt from "bcryptjs";
 
 export const seedSuperAdmin = async () => {
   try {
@@ -21,6 +22,8 @@ export const seedSuperAdmin = async () => {
 
     const password = await hashPassword(envVariables.ADMIN.SUPER_ADMIN_PASSWORD);
 
+    const pin = await bcrypt.hash(envVariables.ADMIN.SUPER_ADMIN_PIN, Number(envVariables.BCRYPT_SALT_ROUNDS));
+
     const payload: Partial<IUser> = {
       firstName: "Admin",
       lastName: "Admin",
@@ -28,7 +31,7 @@ export const seedSuperAdmin = async () => {
       role: UserRole.SUPER_ADMIN,
       password,
       isVerified: true,
-      pin: envVariables.ADMIN.SUPER_ADMIN_PIN,
+      pin: pin,
       address: envVariables.ADMIN.SUPER_ADMIN_ADDRESS,
     };
 

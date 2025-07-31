@@ -58,6 +58,25 @@ const updateWalletType = async (walletId: string) => {
   }
 };
 
+const getMyWallet = async (userId: string) => {
+  // check if userId is valid
+  const wallet = await Wallet.findOne({ user: userId }).select("-user");
+
+  if (!wallet) {
+    throw new AppError(StatusCodes.NOT_FOUND, "Wallet not found");
+  }
+
+  return wallet;
+};
+
+const getAllWallets = async () => {
+  // Call the Wallet model to get all wallets
+  const wallets = await Wallet.find().populate("user", "-password -pin");
+  return wallets;
+};
+
 export const walletService = {
-  updateWalletType,
+  updateWalletType, 
+  getMyWallet,
+  getAllWallets,
 };

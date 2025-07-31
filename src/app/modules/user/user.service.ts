@@ -5,6 +5,8 @@ import { sendOtpEmail } from "../../utils/sendOtpEmail";
 import { hashPassword } from "./../../utils/hashPassword";
 import { IUser, UserRole } from "./user.interface";
 import User from "./user.model";
+import bcrypt from "bcryptjs";
+import envVariables from "../../config/env";
 
 // create user
 const createUser = async (payload: Partial<IUser>) => {
@@ -128,10 +130,44 @@ const getUserById = async (userId: string) => {
   return user;
 };
 
+// change pin
+const changePin = async (userId: string, oldPin: string, newPin: string) => {
+  // check if user exists
+  const user = await User.findById(userId);
+
+  if (!user) {
+    throw new AppError(StatusCodes.NOT_FOUND, "User not found");
+  }
+
+  if (!user.pin) {
+    throw new AppError(StatusCodes.BAD_REQUEST, "User does not have a pin set");
+  }
+
+  // verify old pin
+  const isPinValid = await bcrypt.compare(oldPin, user.pin);
+
+  if (!isPinValid) {
+    throw new AppError(StatusCodes.UNAUTHORIZED, "Old pin is incorrect");
+  }
+
+  const newHashedPin = await bcrypt.hash(newPin, Number(envVariables.BCRYPT_SALT_ROUNDS));
+
+  // update pin
+  await User.findByIdAndUpdate(
+    userId,
+    { pin: newHashedPin },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+};
+
 export const userService = {
   createUser,
   updateUser,
   getAllUsers,
   getUserById,
   getMe,
+  changePin,
 };
