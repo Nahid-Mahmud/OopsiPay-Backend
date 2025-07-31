@@ -7,8 +7,13 @@ interface EnvVariables {
   MONGO_URI: string;
   NODE_ENV: "development" | "production";
   BCRYPT_SALT_ROUNDS: string;
-  SUPER_ADMIN_EMAIL: string;
-  SUPER_ADMIN_PASSWORD: string;
+  ADMIN: {
+    SUPER_ADMIN_EMAIL: string;
+    SUPER_ADMIN_PASSWORD: string;
+    SUPER_ADMIN_PIN: string;
+    SUPER_ADMIN_ADDRESS: string;
+  };
+
   ACCESS_TOKEN_JWT_SECRET: string;
   ACCESS_TOKEN_JWT_EXPIRATION: string;
   REFRESH_TOKEN_JWT_SECRET: string;
@@ -61,6 +66,8 @@ const loadEnvVariable = (): EnvVariables => {
     "REDIS_PORT",
     "REDIS_USERNAME",
     "REDIS_PASSWORD",
+    "SUPER_ADMIN_PIN",
+    "SUPER_ADMIN_ADDRESS",
   ];
 
   requiredEnvVariables.forEach((key) => {
@@ -74,8 +81,12 @@ const loadEnvVariable = (): EnvVariables => {
     MONGO_URI: process.env.MONGO_URI as string,
     NODE_ENV: process.env.NODE_ENV as "development" | "production",
     BCRYPT_SALT_ROUNDS: process.env.BCRYPT_SALT_ROUNDS as string,
-    SUPER_ADMIN_EMAIL: process.env.SUPER_ADMIN_EMAIL as string,
-    SUPER_ADMIN_PASSWORD: process.env.SUPER_ADMIN_PASSWORD as string,
+    ADMIN: {
+      SUPER_ADMIN_EMAIL: process.env.SUPER_ADMIN_EMAIL as string,
+      SUPER_ADMIN_PASSWORD: process.env.SUPER_ADMIN_PASSWORD as string,
+      SUPER_ADMIN_PIN: process.env.SUPER_ADMIN_PIN as string,
+      SUPER_ADMIN_ADDRESS: process.env.SUPER_ADMIN_ADDRESS as string,
+    },
     ACCESS_TOKEN_JWT_SECRET: process.env.ACCESS_TOKEN_JWT_SECRET as string,
     ACCESS_TOKEN_JWT_EXPIRATION: process.env.ACCESS_TOKEN_JWT_EXPIRATION as string,
     REFRESH_TOKEN_JWT_SECRET: process.env.REFRESH_TOKEN_JWT_SECRET as string,
