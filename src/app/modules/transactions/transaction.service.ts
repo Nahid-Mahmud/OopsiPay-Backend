@@ -226,8 +226,6 @@ const createTransaction = async (
           session,
         }
       );
-
-      console.log("Cash Out Transaction");
     }
 
     // ideal admin credit
