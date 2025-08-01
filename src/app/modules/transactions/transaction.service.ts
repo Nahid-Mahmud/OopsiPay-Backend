@@ -254,6 +254,8 @@ const createTransaction = async (
           runValidators: true,
         }
       );
+    } else {
+      throw new AppError(StatusCodes.BAD_REQUEST, "Invalid transaction type");
     }
 
     await session.commitTransaction();
