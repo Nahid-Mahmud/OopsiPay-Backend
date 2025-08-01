@@ -122,16 +122,62 @@ const createTransaction = async (
     //  ideal cash In
 
     if (transactionType === TransactionType.CASH_IN) {
-      if (fromWallet.walletType !== WalletType.USER || toWallet.walletType !== WalletType.MERCHANT) {
+      if (fromWallet.walletType !== WalletType.MERCHANT || toWallet.walletType !== WalletType.USER) {
         throw new AppError(
           StatusCodes.BAD_REQUEST,
-          "source wallet must be user wallet and destination wallet must be agent wallet"
+          "source wallet must be merchant wallet and destination wallet must be user wallet"
         );
       }
 
       // check if fromWallet has sufficient balance
-      if (fromWallet.balance < amount + adminCredit + agentCredit) {
+      if (fromWallet.balance < amount) {
         throw new AppError(StatusCodes.BAD_REQUEST, "Insufficient balance");
+      }
+
+      const deductBalance = amount;
+
+      // update merchant wallet
+      const updateFromWallet = await Wallet.findByIdAndUpdate(
+        fromWallet._id,
+        {
+          $inc: {
+            balance: -deductBalance,
+          },
+        },
+        {
+          runValidators: true,
+          session,
+        }
+      );
+
+      // update user  wallet
+
+      const updateToWallet = await Wallet.findByIdAndUpdate(
+        toWallet._id,
+        {
+          $inc: {
+            balance: amount,
+          },
+        },
+        {
+          runValidators: true,
+          session,
+        }
+      );
+    }
+
+    //  ideal cash Out
+    else if (transactionType === TransactionType.CASH_OUT) {
+      if (fromWallet.walletType !== WalletType.USER || toWallet.walletType !== WalletType.MERCHANT) {
+        throw new AppError(
+          StatusCodes.BAD_REQUEST,
+          "source wallet must be user wallet and destination wallet must be Merchant wallet"
+        );
+      }
+
+      // check if toWallet has sufficient balance
+      if (toWallet.balance < amount + transactionFee) {
+        throw new AppError(StatusCodes.BAD_REQUEST, "Insufficient balance in destination wallet");
       }
 
       const deductBalance = amount + transactionFee;
@@ -149,13 +195,14 @@ const createTransaction = async (
         }
       );
 
-      // update agent wallet
-      const agentTotalAmount = amount + agentCredit;
-      const updateToWallet = await Wallet.findByIdAndUpdate(
-        toWallet._id,
+      // update Merchant wallet
+      const updateMerchantWallet = await Wallet.findOneAndUpdate(
+        {
+          id: toWallet._id,
+        },
         {
           $inc: {
-            balance: agentTotalAmount,
+            balance: agentCredit + amount,
           },
         },
         {
@@ -163,17 +210,61 @@ const createTransaction = async (
           session,
         }
       );
+
+      // update admin wallet
+      const updateAdminWallet = await Wallet.findOneAndUpdate(
+        {
+          walletType: WalletType.ADMIN,
+        },
+        {
+          $inc: {
+            balance: adminCredit,
+          },
+        },
+        {
+          runValidators: true,
+          session,
+        }
+      );
+
+      console.log("Cash Out Transaction");
     }
 
-    //  ideal cash Out
+    // ideal admin credit
+    else if (transactionType === TransactionType.ADMIN_CREDIT) {
+      if (fromWallet.walletType !== WalletType.ADMIN || toWallet.walletType !== WalletType.MERCHANT) {
+        throw new AppError(
+          StatusCodes.BAD_REQUEST,
+          "source wallet must be admin wallet and destination wallet must be merchant wallet"
+        );
+      }
+      // check if fromWallet has sufficient balance
 
-    session.commitTransaction();
+      // update merchant account
+
+      const updateFromWallet = await Wallet.findByIdAndUpdate(
+        {
+          _id: fromWallet._id,
+        },
+        {
+          $inc: {
+            balance: amount,
+          },
+        },
+        {
+          session,
+          runValidators: true,
+        }
+      );
+    }
+
+    await session.commitTransaction();
     return `Transaction successful: ${transactionType} of ${amount} to ${toWalletNumber}`;
   } catch (error) {
-    session.abortTransaction();
+    await session.abortTransaction();
     throw error;
   } finally {
-    session.endSession();
+    await session.endSession();
   }
 
   // update
