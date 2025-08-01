@@ -3,7 +3,7 @@ import { Types } from "mongoose";
 export enum TransactionType {
   CASH_IN = "CASH_IN",
   CASH_OUT = "CASH_OUT",
-  TRANSFER = "TRANSFER",
+  SEND_MONEY = "SEND_MONEY",
   ADMIN_CREDIT = "ADMIN_CREDIT",
 }
 
