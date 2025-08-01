@@ -14,4 +14,10 @@ router.post(
   transactionController.createTransaction
 );
 
+router.get(
+  "/:transactionId",
+  checkAuth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  transactionController.getTransactionById
+);
+
 export const transactionRoutes = router;

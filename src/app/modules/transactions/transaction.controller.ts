@@ -29,6 +29,24 @@ const createTransaction = catchAsync(async (req: Request, res: Response, next: N
   });
 });
 
+const getTransactionById = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  const { transactionId } = req.params;
+
+  if (!transactionId) {
+    return next(new Error("Transaction ID is required"));
+  }
+
+  const transaction: ITransaction = await transactionService.getTransactionById(transactionId);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Transaction retrieved successfully",
+    data: transaction,
+  });
+});
+
 export const transactionController = {
   createTransaction,
+  getTransactionById,
 };

@@ -13,6 +13,7 @@ const generateTransactionId = () => {
   return `txn_${crypto.randomBytes(8).toString("hex")}}`;
 };
 
+// Create a new transaction
 const createTransaction = async (
   toWalletNumber: string,
   amount: number,
@@ -270,6 +271,20 @@ const createTransaction = async (
   // update
 };
 
+// get transaction by id
+const getTransactionById = async (transactionId: string) => {
+  const transaction = await Transaction.findById(transactionId).populate("fromWallet toWallet");
+  if (!transaction) {
+    throw new AppError(StatusCodes.NOT_FOUND, "Transaction not found");
+  }
+  return transaction;
+};
+
+
+
+
+
 export const transactionService = {
   createTransaction,
+  getTransactionById,
 };
