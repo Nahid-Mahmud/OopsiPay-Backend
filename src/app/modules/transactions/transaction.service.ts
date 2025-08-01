@@ -163,25 +163,12 @@ const createTransaction = async (
           session,
         }
       );
-
-      // update admin wallet
-      const updateAdminWallet = await Wallet.findOneAndUpdate(
-        {
-          walletType: WalletType.ADMIN,
-        },
-        {
-          $inc: {
-            balance: adminCredit,
-          },
-        },
-        {
-          runValidators: true,
-          session,
-        }
-      );
     }
 
+    //  ideal cash Out
+
     session.commitTransaction();
+    return `Transaction successful: ${transactionType} of ${amount} to ${toWalletNumber}`;
   } catch (error) {
     session.abortTransaction();
     throw error;

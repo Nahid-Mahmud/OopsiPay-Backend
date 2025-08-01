@@ -19,12 +19,12 @@ const createTransaction = catchAsync(async (req: Request, res: Response, next: N
     return next(new Error("All fields are required"));
   }
 
-  await transactionService.createTransaction(walletNumber, amount, transactionType, userId, reference);
+  const response = await transactionService.createTransaction(walletNumber, amount, transactionType, userId, reference);
 
   sendResponse(res, {
     statusCode: StatusCodes.CREATED,
     success: true,
-    message: "Transaction created successfully",
+    message: response,
     data: null,
   });
 });

@@ -22,6 +22,7 @@ export const userCreateZodSchema = z.object({
   lastName: z.string().min(1, "Last name is required"),
   email: z.email("Invalid email format").min(1, "Email is required"),
   password: passwordZodValidationSchema,
+  role: z.enum([UserRole.USER, UserRole.AGENT]).optional(),
 });
 
 export const updateUserZodSchema = z.object({
