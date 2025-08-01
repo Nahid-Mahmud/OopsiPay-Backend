@@ -1,7 +1,6 @@
-import { Schema } from "mongoose";
+import { model, Schema } from "mongoose";
 import { ITransaction, TransactionStatus, TransactionType } from "./transaction.interface";
-
-export const TransactionSchema = new Schema<ITransaction>(
+const TransactionSchema = new Schema<ITransaction>(
   {
     transactionType: {
       type: String,
@@ -57,3 +56,5 @@ export const TransactionSchema = new Schema<ITransaction>(
     versionKey: false,
   }
 );
+
+export const Transaction = model<ITransaction>("Transaction", TransactionSchema);
