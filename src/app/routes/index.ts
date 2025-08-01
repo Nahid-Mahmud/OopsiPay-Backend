@@ -4,6 +4,7 @@ import { otpRoutes } from "../modules/otp/otp.routes";
 import { userRoutes } from "../modules/user/user.route";
 import { walletRoutes } from "../modules/wallet/wallet.routes";
 import { transactionRoutes } from "../modules/transactions/transaction.route";
+import { statsRoutes } from "../modules/stats/stats.routes";
 
 export const router = Router();
 
@@ -32,6 +33,10 @@ const moduleRoutes: IModuleRoute[] = [
   {
     path: "/transaction",
     route: transactionRoutes,
+  },
+  {
+    path: "/stats",
+    route: statsRoutes,
   },
 ];
 
