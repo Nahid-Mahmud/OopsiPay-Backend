@@ -273,18 +273,23 @@ const createTransaction = async (
 
 // get transaction by id
 const getTransactionById = async (transactionId: string) => {
-  const transaction = await Transaction.findById(transactionId).populate("fromWallet toWallet");
+  const transaction = await Transaction.findById(transactionId).populate(
+    "fromWallet toWallet",
+    "_id walletNumber user"
+  );
   if (!transaction) {
     throw new AppError(StatusCodes.NOT_FOUND, "Transaction not found");
   }
   return transaction;
 };
 
-
-
-
+const getAllTransactions = async () => {
+  const transactions = await Transaction.find({}).populate("fromWallet toWallet", "_id walletNumber user");
+  return transactions;
+};
 
 export const transactionService = {
   createTransaction,
   getTransactionById,
+  getAllTransactions,
 };
