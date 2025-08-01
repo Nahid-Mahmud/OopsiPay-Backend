@@ -16,6 +16,8 @@ router.post(
 
 router.get("/get-all", checkAuth(UserRole.ADMIN, UserRole.SUPER_ADMIN), transactionController.getAllTransactions);
 
+router.get("/my-transactions", checkAuth(...Object.values(UserRole)), transactionController.getMyTransactions);
+
 router.get(
   "/:transactionId",
   checkAuth(UserRole.ADMIN, UserRole.SUPER_ADMIN),

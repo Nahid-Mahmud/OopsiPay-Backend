@@ -57,8 +57,23 @@ const getAllTransactions = catchAsync(async (req: Request, res: Response, next: 
   });
 });
 
+const getMyTransactions = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  const user = req.user as JwtPayload;
+  const userId = user.userId;
+
+  const transactions = await transactionService.getMyTransactions(userId);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "My transactions retrieved successfully",
+    data: transactions,
+  });
+});
+
 export const transactionController = {
   createTransaction,
   getTransactionById,
   getAllTransactions,
+  getMyTransactions,
 };

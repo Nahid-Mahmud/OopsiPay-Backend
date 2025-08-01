@@ -288,8 +288,17 @@ const getAllTransactions = async () => {
   return transactions;
 };
 
+// get my transactions
+const getMyTransactions = async (userId: string) => {
+  const transactions = await Transaction.find({
+    $or: [{ fromUser: new Types.ObjectId(userId) }, { toUser: new Types.ObjectId(userId) }],
+  }).populate("fromWallet toWallet", "_id walletNumber user");
+  return transactions;
+};
+
 export const transactionService = {
   createTransaction,
   getTransactionById,
   getAllTransactions,
+  getMyTransactions,
 };
