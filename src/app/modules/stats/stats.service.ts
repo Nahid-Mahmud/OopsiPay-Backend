@@ -1,3 +1,5 @@
+import { TransactionStatus } from "../transactions/transaction.interface";
+import { Transaction } from "../transactions/transaction.model";
 import { IsActive } from "../user/user.interface";
 import User from "../user/user.model";
 
@@ -56,4 +58,54 @@ const getUserStats = async () => {
   };
 };
 
-export const statsService = { getUserStats };
+const getTransactionStats = async () => {
+  const totalTransactionsPromise = Transaction.countDocuments();
+  const successfulTransactionsPromise = Transaction.countDocuments({ status: TransactionStatus.SUCCESS });
+  const failedTransactionsPromise = Transaction.countDocuments({ status: TransactionStatus.FAILED });
+  const pendingTransactionsPromise = Transaction.countDocuments({ status: TransactionStatus.PENDING });
+  const newTransactionsLast7DaysPromise = Transaction.countDocuments({
+    createdAt: { $gte: new Date(sevenDaysAgo) },
+  });
+  const newTransactionsLast30DaysPromise = Transaction.countDocuments({
+    createdAt: { $gte: new Date(thirtyDaysAgo) },
+  });
+
+  const transactionByTypePromise = Transaction.aggregate([
+    {
+      $group: {
+        _id: "$transactionType",
+        count: { $sum: 1 },
+      },
+    },
+  ]);
+
+  const [
+    totalTransactions,
+    successfulTransactions,
+    failedTransactions,
+    pendingTransactions,
+    newTransactionsLast7Days,
+    newTransactionsLast30Days,
+    transactionByType,
+  ] = await Promise.all([
+    totalTransactionsPromise,
+    successfulTransactionsPromise,
+    failedTransactionsPromise,
+    pendingTransactionsPromise,
+    newTransactionsLast7DaysPromise,
+    newTransactionsLast30DaysPromise,
+    transactionByTypePromise,
+  ]);
+
+  return {
+    totalTransactions,
+    successfulTransactions,
+    failedTransactions,
+    pendingTransactions,
+    newTransactionsLast7Days,
+    newTransactionsLast30Days,
+    transactionByType,
+  };
+};
+
+export const statsService = { getUserStats, getTransactionStats };

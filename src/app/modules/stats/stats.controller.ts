@@ -17,6 +17,18 @@ const getUserStats = catchAsync(async (req: Request, res: Response, next: NextFu
   });
 });
 
+const transactionType = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  const response = await statsService.getTransactionStats();
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Transaction statistics retrieved successfully",
+    data: response,
+  });
+});
+
 export const statsController = {
   getUserStats,
+  transactionType,
 };
