@@ -8,6 +8,8 @@ import { TransactionStatus, TransactionType } from "./transaction.interface";
 import AppError from "../../errorHelpers/AppError";
 import { StatusCodes } from "http-status-codes";
 import { WalletType } from "../wallet/wallet.interface";
+import bcrypt from "bcryptjs";
+import { IUser } from "../user/user.interface";
 
 const generateTransactionId = () => {
   return `txn_${crypto.randomBytes(8).toString("hex")}}`;
@@ -19,21 +21,38 @@ const createTransaction = async (
   amount: number,
   transactionType: string,
   userId: string,
+  pin: string,
   reference?: string
 ) => {
+  // destination wallet
   const toWallet = await Wallet.findOne({
     walletNumber: toWalletNumber,
   }).populate("user", "_id");
-  const fromWallet = await Wallet.findOne({
-    user: userId,
-  });
 
   if (!toWallet) {
     throw new AppError(StatusCodes.NOT_FOUND, "Destination Wallet not found");
   }
 
+  // source wallet
+  const fromWallet = await Wallet.findOne({
+    user: userId,
+  }).populate("user", "_id pin");
+
   if (!fromWallet) {
     throw new AppError(StatusCodes.NOT_FOUND, "Source Wallet not found");
+  }
+
+  // Validate pin if provided
+
+  const userPin = (fromWallet.user as unknown as IUser).pin;
+
+  if (!userPin) {
+    throw new AppError(StatusCodes.UNAUTHORIZED, "User pin is not set");
+  }
+  const validatePin = bcrypt.compareSync(pin, userPin);
+
+  if (!validatePin) {
+    throw new AppError(StatusCodes.UNAUTHORIZED, "Invalid pin");
   }
 
   const { transactionFee, netAmount, adminCredit, agentCredit } = calculateTransactionFee(amount, transactionType);

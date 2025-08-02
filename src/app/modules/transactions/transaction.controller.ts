@@ -9,17 +9,24 @@ import { IWallet } from "../wallet/wallet.interface";
 import { JwtPayload } from "jsonwebtoken";
 
 const createTransaction = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const { walletNumber, amount, transactionType, reference } = req.body;
+  const { walletNumber, amount, transactionType, reference, pin } = req.body;
 
   const user = req.user as JwtPayload;
 
   const userId = user.userId;
 
-  if (!walletNumber || !amount || !transactionType) {
+  if (!walletNumber || !amount || !transactionType || !pin) {
     return next(new Error("All fields are required"));
   }
 
-  const response = await transactionService.createTransaction(walletNumber, amount, transactionType, userId, reference);
+  const response = await transactionService.createTransaction(
+    walletNumber,
+    amount,
+    transactionType,
+    userId,
+    pin,
+    reference
+  );
 
   sendResponse(res, {
     statusCode: StatusCodes.CREATED,

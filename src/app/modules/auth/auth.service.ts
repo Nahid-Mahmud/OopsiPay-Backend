@@ -24,7 +24,7 @@ const credentialLogin = async (req: Request, res: Response, next: NextFunction) 
         return reject(new AppError(StatusCodes.UNAUTHORIZED, info.message || "Invalid credentials"));
       }
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...userWithoutPassword } = user.toObject();
+      const { password, pin, ...userWithoutPassword } = user.toObject();
       resolve(userWithoutPassword);
     })(req, res, next);
   });
