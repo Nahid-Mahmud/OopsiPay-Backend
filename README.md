@@ -193,10 +193,10 @@ http://localhost:5000/api/v1
 
 ### 📊 Statistics Endpoints (`/stats`)
 
-| Method | Endpoint              | Description                                    | Auth Required  | Roles              |
-| ------ | --------------------- | ---------------------------------------------- | -------------- | ------------------ |
-| GET    | `/stats/user`         | Get user statistics (total, active, new users) | ✅             | Admin, Super Admin |
-| GET    | `/stats/transactions` | Get transaction statistics by type and status  | ✅             | Admin, Super Admin |
+| Method | Endpoint              | Description                                    | Auth Required | Roles              |
+| ------ | --------------------- | ---------------------------------------------- | ------------- | ------------------ |
+| GET    | `/stats/user`         | Get user statistics (total, active, new users) | ✅            | Admin, Super Admin |
+| GET    | `/stats/transactions` | Get transaction statistics by type and status  | ✅            | Admin, Super Admin |
 
 **User Statistics Include:**
 
