@@ -39,7 +39,7 @@ const createUser = async (payload: Partial<IUser>) => {
     );
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password: userPassword, ...rest } = res[0].toObject();
+    const { password: userPassword, pin: userPin, ...rest } = res[0].toObject();
 
     // create wallet number
 
