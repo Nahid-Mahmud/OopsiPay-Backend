@@ -140,8 +140,7 @@ const createTransaction = async (
     }
 
     //  ideal cash In
-
-    if (transactionType === TransactionType.CASH_IN) {
+    else if (transactionType === TransactionType.CASH_IN) {
       if (fromWallet.walletType !== WalletType.MERCHANT || toWallet.walletType !== WalletType.USER) {
         throw new AppError(
           StatusCodes.BAD_REQUEST,
