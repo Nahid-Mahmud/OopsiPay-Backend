@@ -7,6 +7,7 @@ export const redisClient = createClient({
   socket: {
     host: envVariables.REDIS.REDIS_HOST,
     port: Number(envVariables.REDIS.REDIS_PORT),
+    connectTimeout: 10000,
   },
 });
 
