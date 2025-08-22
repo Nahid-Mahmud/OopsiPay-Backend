@@ -22,6 +22,13 @@ export const sendOtpEmail = async ({
 
   const otp = generateOtp(6);
   // store otp in redis
+
+  // invalid previous otp
+  const previousOtp = await redisClient.get(`otp:${email}`);
+  if (previousOtp) {
+    await redisClient.del(`otp:${email}`);
+  }
+
   const redisKey = `otp:${email}`;
   await redisClient.set(redisKey, otp, {
     expiration: {
