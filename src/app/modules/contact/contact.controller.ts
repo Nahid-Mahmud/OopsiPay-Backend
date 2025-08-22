@@ -7,12 +7,12 @@ import { StatusCodes } from "http-status-codes";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const createContact = catchAsync(async (req: Request, res: Response, _next: NextFunction) => {
   const contactData = req.body;
-  const newContact = await contactService.createContact(contactData);
+  await contactService.createContact(contactData);
 
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.CREATED,
-    data: newContact,
+    data: null,
     message: "Contact created successfully",
   });
 });

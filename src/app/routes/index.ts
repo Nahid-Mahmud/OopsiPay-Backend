@@ -40,7 +40,7 @@ const moduleRoutes: IModuleRoute[] = [
     route: statsRoutes,
   },
   {
-    path: "/contact",
+    path: "/contact-us",
     route: contactRoutes,
   },
 ];
