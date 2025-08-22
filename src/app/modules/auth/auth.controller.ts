@@ -10,6 +10,7 @@ import { IUser } from "../user/user.interface";
 import envVariables from "../../config/env";
 import { JwtPayload } from "jsonwebtoken";
 import AppError from "../../errorHelpers/AppError";
+import User from "../user/user.model";
 
 const credentialLogin = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const result = (await authService.credentialLogin(req, res, next)) as Partial<IUser>;
@@ -109,6 +110,8 @@ const forgotPassword = catchAsync(async (req: Request, res: Response, _next: Nex
   if (!email) {
     throw new AppError(StatusCodes.BAD_REQUEST, "Email is required");
   }
+
+  // check if user exist
 
   // Call the service to handle forgot password logic
   await authService.forgotPassword(email);

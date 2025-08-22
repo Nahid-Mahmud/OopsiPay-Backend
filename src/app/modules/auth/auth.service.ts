@@ -115,11 +115,11 @@ const forgotPassword = async (email: string) => {
   };
 
   const resetToken = jwt.sign(JwtPayload, envVariables.ACCESS_TOKEN_JWT_SECRET, {
-    expiresIn: "10m",
+    expiresIn: "5m",
   });
 
   const resetUILink = `${envVariables.FRONTEND_URL}/reset-password?id=${isUserExist._id}&token=${resetToken}`;
-  sendEmail({
+  await sendEmail({
     to: isUserExist.email,
     subject: "Password Reset Request",
     templateName: "forgotPassword.ejs",

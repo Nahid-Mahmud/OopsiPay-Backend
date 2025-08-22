@@ -49,7 +49,7 @@ const createUser = async (payload: Partial<IUser>) => {
     // send OTP after the transaction is committed
     await sendOtpEmail({
       email,
-      expirationTimeInSeconds: 300, // 5 minutes
+      expirationTimeInSeconds: 180, // 3 minutes
     });
 
     return rest;
