@@ -11,12 +11,7 @@ router.post("/login", validateRequest(userLoginJodValidation), authController.cr
 router.post("/refresh-token", authController.generateAccessTokenFromRefreshToken);
 router.post("/logout", authController.logout);
 
-router.patch(
-  "/reset-password",
-  validateRequest(resetPasswordZodSchema),
-  checkAuth(...Object.values(UserRole)),
-  authController.resetPassword
-);
+router.post("/reset-password", validateRequest(resetPasswordZodSchema), authController.resetPassword);
 
 router.patch("/change-password", checkAuth(...Object.values(UserRole)), authController.changePassword);
 

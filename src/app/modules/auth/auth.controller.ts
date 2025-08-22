@@ -75,11 +75,20 @@ const logout = catchAsync(async (req: Request, res: Response, _next: NextFunctio
 });
 
 const resetPassword = catchAsync(async (req: Request, res: Response, _next: NextFunction) => {
-  const decodedToken = req.user;
+  const token = req.query.token as string;
+  const id = req.query.id as string;
 
-  const { newPassword, id } = req.body;
+  if (!id) {
+    throw new AppError(StatusCodes.BAD_REQUEST, "User ID is required");
+  }
 
-  await authService.resetPassword(newPassword, id, decodedToken as JwtPayload);
+  if (!token) {
+    throw new AppError(StatusCodes.BAD_REQUEST, "Reset token is required");
+  }
+
+  const { newPassword } = req.body;
+
+  await authService.resetPassword(token, id, newPassword);
 
   sendResponse(res, {
     success: true,

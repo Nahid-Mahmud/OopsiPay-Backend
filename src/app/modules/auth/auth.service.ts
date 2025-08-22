@@ -35,7 +35,9 @@ const generateAccessTokenFromRefreshToken = async (refreshToken: string) => {
   return newAccessToken;
 };
 
-const resetPassword = async (newPassword: string, id: string, decodedToken: JwtPayload) => {
+const resetPassword = async (token: string, id: string, newPassword: string) => {
+  const decodedToken = jwt.verify(token, envVariables.ACCESS_TOKEN_JWT_SECRET) as JwtPayload;
+
   if (decodedToken.userId !== id) {
     throw new AppError(StatusCodes.UNAUTHORIZED, "You are not authorized to perform this action");
   }
