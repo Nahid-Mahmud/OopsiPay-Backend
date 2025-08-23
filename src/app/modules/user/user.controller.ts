@@ -92,6 +92,20 @@ const changePin = catchAsync(async (req: Request, res: Response, _next: NextFunc
   });
 });
 
+const setPinFirstTime = catchAsync(async (req: Request, res: Response, _next: NextFunction) => {
+  const decodedToken = req.user as JwtPayload;
+  const { pin } = req.body;
+
+  const user = await userService.setPinFirstTime(decodedToken.userId, pin);
+
+  sendResponse(res, {
+    success: true,
+    message: "Pin set successfully",
+    data: user,
+    statusCode: StatusCodes.OK,
+  });
+});
+
 export const userController = {
   createUser,
   updateUser,
@@ -99,4 +113,5 @@ export const userController = {
   getMe,
   getUserById,
   changePin,
+  setPinFirstTime,
 };
