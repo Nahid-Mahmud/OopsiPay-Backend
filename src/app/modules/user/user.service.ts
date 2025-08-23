@@ -99,15 +99,10 @@ const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken:
     }
   }
 
-  if (payload.pin && (user.role === UserRole.USER || user.role === UserRole.AGENT)) {
-    // check if pin has already been set
-    if (user.pin) {
+  if (payload.pin) {
+    if (user.role === UserRole.USER || user.role === UserRole.AGENT) {
       throw new AppError(StatusCodes.BAD_REQUEST, "Pin has already been set. Use change pin to update it");
     }
-  }
-
-  if (payload.pin) {
-    payload.pin = await bcrypt.hash(payload.pin, Number(envVariables.BCRYPT_SALT_ROUNDS));
   }
 
   const updatedUser = await User.findByIdAndUpdate(userId, payload, {
@@ -177,6 +172,30 @@ const changePin = async (userId: string, oldPin: string, newPin: string) => {
   );
 };
 
+const setPinFirstTime = async (userId: string, pin: string) => {
+  // check if user exists
+  const user = await User.findById(userId);
+
+  if (!user) {
+    throw new AppError(StatusCodes.NOT_FOUND, "User not found");
+  }
+  if (user.pin) {
+    throw new AppError(StatusCodes.BAD_REQUEST, "Pin has already been set. Use change pin to update it");
+  }
+
+  if (user.pin) {
+    throw new AppError(StatusCodes.BAD_REQUEST, "User already has a pin set");
+  }
+
+  // Hash the PIN before saving
+  const hashedPin = await bcrypt.hash(pin, Number(envVariables.BCRYPT_SALT_ROUNDS));
+
+  user.pin = hashedPin;
+  await user.save();
+
+  return user;
+};
+
 export const userService = {
   createUser,
   updateUser,
@@ -184,4 +203,5 @@ export const userService = {
   getUserById,
   getMe,
   changePin,
+  setPinFirstTime,
 };
