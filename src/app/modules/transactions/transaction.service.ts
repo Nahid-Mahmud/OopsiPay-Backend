@@ -10,6 +10,7 @@ import { StatusCodes } from "http-status-codes";
 import { WalletType } from "../wallet/wallet.interface";
 import bcrypt from "bcryptjs";
 import { IUser } from "../user/user.interface";
+import { QueryBuilder } from "../../utils/queryBuilder";
 
 const generateTransactionId = () => {
   return `txn_${crypto.randomBytes(8).toString("hex")}}`;
@@ -301,9 +302,12 @@ const getTransactionById = async (transactionId: string) => {
   return transaction;
 };
 
-const getAllTransactions = async () => {
-  const transactions = await Transaction.find({}).populate("fromWallet toWallet", "_id walletNumber user");
-  return transactions;
+const getAllTransactions = async (query: Record<string, string>) => {
+  const queryBuilder = new QueryBuilder(Transaction.find(), query);
+
+  const transactions = await queryBuilder.paginate().build().populate("fromWallet toWallet", "_id walletNumber user");
+  const meta = await queryBuilder.getMeta();
+  return { transactions, meta };
 };
 
 // get my transactions
