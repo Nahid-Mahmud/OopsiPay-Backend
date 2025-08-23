@@ -11,6 +11,14 @@ const router = Router();
 // create user
 router.post("/create", validateRequest(userCreateZodSchema), userController.createUser);
 
+router.patch("/set-pin", checkAuth(...Object.values(UserRole)), userController.setPinFirstTime);
+
+// get All Users
+router.get("/get-all", checkAuth(UserRole.ADMIN, UserRole.SUPER_ADMIN), userController.getAllUsers);
+
+// get me route
+router.get("/me", checkAuth(...Object.values(UserRole)), userController.getMe);
+router.post("/change-pin", checkAuth(...Object.values(UserRole)), userController.changePin);
 // update user
 router.patch(
   "/:userId",
@@ -19,13 +27,6 @@ router.patch(
   validateRequest(updateUserZodSchema),
   userController.updateUser
 );
-
-// get All Users
-router.get("/get-all", checkAuth(UserRole.ADMIN, UserRole.SUPER_ADMIN), userController.getAllUsers);
-
-// get me route
-router.get("/me", checkAuth(...Object.values(UserRole)), userController.getMe);
-router.post("/change-pin", checkAuth(...Object.values(UserRole)), userController.changePin);
 
 // get user by userID
 
