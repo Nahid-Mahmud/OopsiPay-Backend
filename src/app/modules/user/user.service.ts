@@ -7,6 +7,7 @@ import { sendOtpEmail } from "../../utils/sendOtpEmail";
 import { hashPassword } from "./../../utils/hashPassword";
 import { IUser, UserRole } from "./user.interface";
 import User from "./user.model";
+import { QueryBuilder } from "../../utils/queryBuilder";
 
 // create user
 const createUser = async (payload: Partial<IUser>) => {
@@ -117,10 +118,12 @@ const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken:
 };
 
 // get all users
-const getAllUsers = async () => {
-  const users = await User.find({}).select("-password");
-  const totalUsers = await User.countDocuments();
-  return { data: users, meta: totalUsers };
+const getAllUsers = async (query: Record<string, string>) => {
+  const queryBuilder = new QueryBuilder(User.find(), query);
+
+  const users = await queryBuilder.filter().sort().paginate().build().select("-password -pin");
+  const meta = await queryBuilder.getMeta();
+  return { data: users, meta };
 };
 
 // get logged-in user
