@@ -77,8 +77,9 @@ const getAllWallets = async (query: Record<string, string>) => {
 
   // const wallets = await Wallet.find().populate("user", "-password -pin");
   const wallets = await queryBuilder.paginate().build().populate("user", "-password -pin");
+  const meta = await queryBuilder.getMeta();
 
-  return wallets;
+  return { wallets, meta };
 };
 
 const getWalletByUserId = async (userId: string) => {
