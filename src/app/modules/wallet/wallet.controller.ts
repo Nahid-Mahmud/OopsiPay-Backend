@@ -50,7 +50,8 @@ const getAllWallets = catchAsync(async (req: Request, res: Response, next: NextF
     statusCode: StatusCodes.OK,
     success: true,
     message: "All wallets retrieved successfully",
-    data: wallets,
+    data: wallets.wallets,
+    meta: wallets.meta,
   });
 });
 
