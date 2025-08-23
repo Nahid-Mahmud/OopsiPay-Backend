@@ -41,7 +41,10 @@ const getMyWallet = catchAsync(async (req: Request, res: Response, next: NextFun
 
 const getAllWallets = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   // Call the service to get all wallets
-  const wallets = await walletService.getAllWallets();
+
+  const query = req.query;
+
+  const wallets = await walletService.getAllWallets(query as Record<string, string>);
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
