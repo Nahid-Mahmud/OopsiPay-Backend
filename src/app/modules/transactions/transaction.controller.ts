@@ -54,13 +54,15 @@ const getTransactionById = catchAsync(async (req: Request, res: Response, next: 
 });
 
 const getAllTransactions = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const transactions = await transactionService.getAllTransactions();
+  const query = req.query;
+  const { transactions, meta } = await transactionService.getAllTransactions(query as Record<string, string>);
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
     message: "Transactions retrieved successfully",
     data: transactions,
+    meta,
   });
 });
 
