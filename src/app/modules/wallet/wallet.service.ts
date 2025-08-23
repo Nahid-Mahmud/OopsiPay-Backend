@@ -4,6 +4,7 @@ import { IUser, UserRole } from "../user/user.interface";
 import { WalletType } from "./wallet.interface";
 import { Wallet } from "./wallet.model";
 import User from "../user/user.model";
+import { QueryBuilder } from "../../utils/queryBuilder";
 
 const updateWalletType = async (walletId: string) => {
   // check if walletId is valid
@@ -69,9 +70,14 @@ const getMyWallet = async (userId: string) => {
   return wallet;
 };
 
-const getAllWallets = async () => {
+const getAllWallets = async (query: Record<string, string>) => {
   // Call the Wallet model to get all wallets
-  const wallets = await Wallet.find().populate("user", "-password -pin");
+
+  const queryBuilder = new QueryBuilder(Wallet.find(), query);
+
+  // const wallets = await Wallet.find().populate("user", "-password -pin");
+  const wallets = await queryBuilder.paginate().build().populate("user", "-password -pin");
+
   return wallets;
 };
 
