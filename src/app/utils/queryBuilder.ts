@@ -49,6 +49,24 @@ export class QueryBuilder<T> {
     return this;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  populate(populateFields: string | string[] | any, select?: string): this {
+    if (Array.isArray(populateFields)) {
+      for (const field of populateFields) {
+        this.modelQuery = this.modelQuery.populate(field);
+      }
+    } else if (typeof populateFields === "string" && select) {
+      // Handle populate("user", "-password -pin") syntax
+      this.modelQuery = this.modelQuery.populate({
+        path: populateFields,
+        select: select,
+      });
+    } else {
+      this.modelQuery = this.modelQuery.populate(populateFields);
+    }
+    return this;
+  }
+
   async getMeta() {
     const totalDocuments = await this.modelQuery.model.countDocuments();
     const page = parseInt(this.query.page, 10) || 1;
