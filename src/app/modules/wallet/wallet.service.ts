@@ -1,10 +1,10 @@
 import { StatusCodes } from "http-status-codes";
 import AppError from "../../errorHelpers/AppError";
+import { QueryBuilder } from "../../utils/queryBuilder";
 import { IUser, UserRole } from "../user/user.interface";
+import User from "../user/user.model";
 import { WalletType } from "./wallet.interface";
 import { Wallet } from "./wallet.model";
-import User from "../user/user.model";
-import { QueryBuilder } from "../../utils/queryBuilder";
 
 const updateWalletType = async (walletId: string) => {
   // check if walletId is valid
@@ -76,7 +76,7 @@ const getAllWallets = async (query: Record<string, string>) => {
   const queryBuilder = new QueryBuilder(Wallet.find(), query);
 
   // const wallets = await Wallet.find().populate("user", "-password -pin");
-  const wallets = await queryBuilder.paginate().build().populate("user", "-password -pin");
+  const wallets = await queryBuilder.paginate().search(["walletNumber"]).build().populate("user", "-password -pin");
   const meta = await queryBuilder.getMeta();
 
   return { wallets, meta };
@@ -93,9 +93,42 @@ const getWalletByUserId = async (userId: string) => {
   return wallet;
 };
 
+const updateWalletStatus = async (walletId: string, walletStatus: string) => {
+  if (!walletStatus) {
+    throw new AppError(StatusCodes.BAD_REQUEST, "Wallet status is required");
+  }
+
+  if (!walletStatus) {
+    throw new AppError(StatusCodes.BAD_REQUEST, "Wallet status is required");
+  }
+
+  // check if walletId is valid
+  const wallet = await Wallet.findById(walletId);
+
+  if (!wallet) {
+    throw new AppError(StatusCodes.NOT_FOUND, "Wallet not found");
+  }
+
+  // Cast walletStatus to WalletStatus enum
+
+  const updatedWallet = await Wallet.findByIdAndUpdate(
+    walletId,
+    {
+      walletStatus: walletStatus,
+    },
+    {
+      runValidators: true,
+      new: true,
+    }
+  );
+
+  return updatedWallet;
+};
+
 export const walletService = {
   updateWalletType,
   getMyWallet,
   getAllWallets,
   getWalletByUserId,
+  updateWalletStatus,
 };
