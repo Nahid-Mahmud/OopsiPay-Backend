@@ -74,9 +74,30 @@ const getWalletByUserId = catchAsync(async (req: Request, res: Response, next: N
   });
 });
 
+const updateWalletStatus = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  const { walletId } = req.params;
+  const { walletStatus } = req.body;
+
+  // Validate walletId and status
+  if (!walletId || !walletStatus) {
+    return next(new Error("Wallet ID and status are required"));
+  }
+
+  // Call the service to update the wallet status
+  const response = await walletService.updateWalletStatus(walletId, walletStatus);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Wallet status updated successfully",
+    data: response,
+  });
+});
+
 export const walletController = {
   updateWalletType,
   getMyWallet,
   getAllWallets,
   getWalletByUserId,
+  updateWalletStatus,
 };
