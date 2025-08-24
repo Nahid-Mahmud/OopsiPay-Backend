@@ -13,7 +13,7 @@ import { IUser } from "../user/user.interface";
 import { QueryBuilder } from "../../utils/queryBuilder";
 
 const generateTransactionId = () => {
-  return `txn_${crypto.randomBytes(8).toString("hex")}}`;
+  return `txn_${crypto.randomBytes(8).toString("hex")}`;
 };
 
 // Create a new transaction
@@ -312,9 +312,14 @@ const getAllTransactions = async (query: Record<string, string>) => {
 
 // get my transactions
 const getMyTransactions = async (userId: string) => {
+  const myWallet = await Wallet.findOne({
+    user: new Types.ObjectId(userId),
+  });
+
   const transactions = await Transaction.find({
-    $or: [{ fromUser: new Types.ObjectId(userId) }, { toUser: new Types.ObjectId(userId) }],
+    fromWallet: myWallet?._id,
   }).populate("fromWallet toWallet", "_id walletNumber user");
+
   return transactions;
 };
 
