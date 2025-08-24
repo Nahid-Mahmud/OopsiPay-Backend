@@ -31,6 +31,7 @@ export const updateUserZodSchema = z.object({
   email: z.email("Invalid email format").optional(),
   role: z.enum(Object.values(UserRole)).optional(),
   profilePicture: z.string().optional(),
+  deleteImages: z.array(z.string()).optional(),
   address: z.string().optional(),
   phone: z.string().optional(),
   // pin: z.string().min(5, "Pin must be at least 5 characters long").optional(),
@@ -44,4 +45,8 @@ export const updateUserZodSchema = z.object({
 export const changePinZodSchema = z.object({
   oldPin: z.string().min(5, "Old pin must be at least 5 characters long"),
   newPin: z.string().min(5, "New pin must be at least 5 characters long"),
+});
+
+export const setPinFirstTimeZodSchema = z.object({
+  pin: z.string().length(5, "Pin must be exactly 5 characters long"),
 });
