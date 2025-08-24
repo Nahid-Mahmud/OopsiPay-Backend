@@ -8,6 +8,7 @@ import { hashPassword } from "./../../utils/hashPassword";
 import { IUser, UserRole } from "./user.interface";
 import User from "./user.model";
 import { QueryBuilder } from "../../utils/queryBuilder";
+import { deleteImageFormCloudinary } from "../../config/cloudinary.config";
 
 // create user
 const createUser = async (payload: Partial<IUser>) => {
@@ -105,6 +106,10 @@ const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken:
     }
   }
 
+  if (payload.deleteImages) {
+    await Promise.all(payload.deleteImages.map((element) => deleteImageFormCloudinary(element)));
+  }
+
   const updatedUser = await User.findByIdAndUpdate(userId, payload, {
     new: true,
     runValidators: true,
@@ -123,11 +128,14 @@ const getAllUsers = async (query: Record<string, string>) => {
 
 // get logged-in user
 const getMe = async (userId: string) => {
-  const user = await User.findById(userId).select("-password -isActive -isVerified");
+  const user = await User.findById(userId).select("-password -isActive -isVerified -isDeleted -agentRequestStatus");
   if (!user) {
     throw new AppError(StatusCodes.NOT_FOUND, "User not found");
   }
-  return user;
+
+  const myUser = { ...user.toObject(), pin: user?.pin ? true : false };
+
+  return myUser;
 };
 
 // get user by userID
