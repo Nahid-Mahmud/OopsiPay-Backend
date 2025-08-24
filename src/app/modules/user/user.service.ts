@@ -116,9 +116,9 @@ const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken:
 const getAllUsers = async (query: Record<string, string>) => {
   const queryBuilder = new QueryBuilder(User.find(), query);
 
-  const users = await queryBuilder.paginate().build().select("-password -pin");
-  const meta = await queryBuilder.getMeta();
-  return { data: users, meta };
+  const users = await queryBuilder.filter().build().select("-password -pin");
+  // const meta = await queryBuilder.getMeta();
+  return { data: users };
 };
 
 // get logged-in user

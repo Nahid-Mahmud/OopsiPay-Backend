@@ -32,6 +32,7 @@ app.use(
   cors({
     origin: [envVariables.FRONTEND_URL],
     credentials: true, // Allow cookies to be sent with requests
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"], // Allow specific HTTP methods
   })
 );
 

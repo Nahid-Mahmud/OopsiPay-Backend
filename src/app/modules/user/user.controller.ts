@@ -52,7 +52,6 @@ const getAllUsers = catchAsync(async (req: Request, res: Response, _next: NextFu
     message: "Users retrieved successfully",
     data: result.data,
     statusCode: StatusCodes.OK,
-    meta: result.meta,
   });
 });
 

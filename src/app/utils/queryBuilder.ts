@@ -4,6 +4,9 @@ import { excludeFields } from "../constants/constants";
 export class QueryBuilder<T> {
   public modelQuery: Query<T[], T>;
   public readonly query: Record<string, string>;
+  private appliedFilters: Record<string, unknown> = {};
+  private searchQuery: Record<string, unknown> = {};
+
   constructor(modelQuery: Query<T[], T>, query: Record<string, string>) {
     this.modelQuery = modelQuery;
     this.query = query;
@@ -15,15 +18,20 @@ export class QueryBuilder<T> {
       // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
       delete filter[field];
     }
+    this.appliedFilters = { ...filter };
     this.modelQuery = this.modelQuery.find(filter);
     return this;
   }
+
   search(searchableFields: string[]): this {
     const searchTerm = this.query.searchTerm || "";
-    const searchQuery = {
-      $or: searchableFields.map((field: string) => ({ [field]: { $regex: searchTerm, $options: "i" } })),
-    };
-    this.modelQuery = this.modelQuery.find(searchQuery);
+    if (searchTerm) {
+      const searchQuery = {
+        $or: searchableFields.map((field: string) => ({ [field]: { $regex: searchTerm, $options: "i" } })),
+      };
+      this.searchQuery = searchQuery;
+      this.modelQuery = this.modelQuery.find(searchQuery);
+    }
     return this;
   }
   sort(): this {
@@ -68,7 +76,20 @@ export class QueryBuilder<T> {
   }
 
   async getMeta() {
-    const totalDocuments = await this.modelQuery.model.countDocuments();
+    // Create a new query to count documents with the same filters
+    let countQuery = this.modelQuery.model.find();
+
+    // Apply the same filters that were applied to the main query
+    if (Object.keys(this.appliedFilters).length > 0) {
+      countQuery = countQuery.find(this.appliedFilters);
+    }
+
+    // Apply the same search query if it exists
+    if (Object.keys(this.searchQuery).length > 0) {
+      countQuery = countQuery.find(this.searchQuery);
+    }
+
+    const totalDocuments = await countQuery.countDocuments();
     const page = parseInt(this.query.page, 10) || 1;
     const limit = parseInt(this.query.limit, 10) || 10;
     const totalPages = Math.ceil(totalDocuments / limit);
