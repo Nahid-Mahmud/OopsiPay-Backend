@@ -36,4 +36,5 @@ export interface IUser {
   isDeleted: boolean;
   isVerified?: boolean;
   agentRequestStatus?: AgentRequestStatus;
+  deleteImages?: string[];
 }
